@@ -25,7 +25,7 @@ class const_iterator {
 
 public:
 	typedef const_iterator Self; //Type of forward iterator
-	const_iterator(Node* n=nullptr) 
+	const_iterator(NodePtr n=nullptr) 
 		:_pNode(n)// Constructors // we construct an iterator through the pointer of a node
 	{
 	}
@@ -327,7 +327,7 @@ public:
 
 	typedef const_iterator<T> iterator;
 	
-	iterator begin()
+	iterator begin() const
 	{
 		Node* left = root;
 		while (left && left->_left)
@@ -338,7 +338,7 @@ public:
 		return iterator(left);
 	}
 
-	iterator end()
+	iterator end() const
 	{
 		return iterator(nullptr);
 	}
@@ -511,11 +511,27 @@ int main() {
 	bst.insert(17);
 	bst.insert(25);
 	bst.insert(40);
-	bst.insert(80);
+	bst.insert(87);
 	bst.insert(100);
 	bst.prettyPrint();
 	bst.deleteNode(25);
 	bst.prettyPrint();
 	
+	const_iterator it = bst.begin();
+	++it;
+
+	cout << *it << " ";
+
+	++it;
+
+	cout << *it << " ";
+
+	// while (it != bst.end())
+    // {
+    //     cout << *it << " ";
+    //     ++it;
+    // }
+     cout << endl;
+
 	return 0;
 }
