@@ -21,6 +21,7 @@ template< class T>
 class const_iterator {
 	private:
 	Node* _pNode;
+	Node* TNULL;
 	// RBTree<T,CMP> _t;
 
 public:
@@ -30,14 +31,15 @@ public:
 	{
 	}
 	Self& begin() const {return _pNode;}
+	
 
 	// When the iterator dereferences, we return a reference to the node data
 	const T& operator*() const {
-		return _pNode->data;
+		return this->_pNode->data;
 	}
 	//When the iterator performs the - > operation, we return the pointer of the node data
 	const T* operator->() const {
-		return &(_pNode->data);
+		return &(this->_pNode->data);
 	}
 
 	Self& operator++() {
@@ -46,17 +48,17 @@ public:
 	}
 
 	Self& operator++(int) {
-		Self tmp = this;
+		Self tmp = this->_pNode;
 		Increment();
 		return tmp;
 	}
 	// implement = = and != To determine whether the node is the same
 
 	bool operator==(const Self& s) {
-		return _pNode == s._pNode;
+		return this->_pNode == s._pNode;
 	}
 	bool operator!=(const Self& s) {
-		return _pNode != s._pNode;
+		return this->_pNode != s._pNode;
 	}
 
 	// begin and end of iterators in red black tree:
@@ -65,23 +67,78 @@ public:
     //end returns the iterator at the next position of the last node in the middle order. Here, use a null pointer.
 
 private:
+	void incrimen(){
+		Node* p;
+  Node* temp = _pNode;
+  if (this->_pNode == nullptr)
+    {
+      // ++ from end(). get the root of the tree
+      Node* temp = _pNode->parent;
+      
+      // error! ++ requested for an empty tree
+      if (temp == nullptr)
+      
+      // move to the smallest value in the tree,
+      // which is the first node inorder
+      while (temp->_left != nullptr) {
+        temp = temp->_left;
+      }
+    }
+  else
+    if (temp->_right != nullptr)
+      {
+        // successor is the farthest left node of
+        // right subtree
+        temp = temp->_right;
+        
+        while (temp->_left != nullptr) {
+          temp = temp->_left;
+        }
+      }
+    else
+      {
+        // have already processed the left subtree, and
+        // there is no right subtree. move up the tree,
+        // looking for a parent for which nodePtr is a left child,
+        // stopping if the parent becomes NULL. a non-NULL parent
+        // is the successor. if parent is NULL, the original node
+        // was the last node inorder, and its successor
+        // is the end of the list
+        p = temp->parent;
+        while (p != nullptr && temp == p->_right)
+          {
+            temp = p;
+            p = p->parent;
+          }
+        
+        // if we were previously at the right-most node in
+        // the tree, nodePtr = nullptr, and the iterator specifies
+        // the end of the list
+        this->_pNode= p;
+      }
+	}
+
 	void Increment() {
-		if (_pNode->_right) {
+		if (this->_pNode->_right) {
+			// The next access is the first node in the middle order in the right tree
 			Node* temp = _pNode->_right;
+
 			while (temp->_left) {
 				temp = temp->_left;
 			}
-			_pNode = temp;
+			this->_pNode = temp; //++Then it becomes the node
 
 		}
-		else
+		else  //The right subtree is empty
 		{
+			//Find an ancestor whose child is not on the father's right
 			Node* tmp = _pNode->parent;
+
 			if (tmp->_right==_pNode) {
-				while (_pNode==tmp->_right)
+				while (_pNode==tmp->_right and _pNode->parent!=TNULL)
 				{
 					_pNode = tmp;
-					tmp = tmp->parent;
+					tmp = tmp->parent; //++Then it becomes the node
 				}
 			}
 			if (_pNode->_right != tmp)
@@ -97,7 +154,7 @@ template< class T, typename CMP>
 // class RBTree implements the operations in Red Black Tree
 class RBTree {
 private:
-	NodePtr root;
+	Node* root;
 	NodePtr TNULL;
 
 	// initializes the nodes with appropirate values
@@ -329,8 +386,8 @@ public:
 	
 	iterator begin() const
 	{
-		Node* left = root;
-		while (left && left->_left)
+		NodePtr left = this->root;
+		if (left && left->_left)
 		{
 			left = left->_left;
 		}
@@ -340,7 +397,7 @@ public:
 
 	iterator end() const
 	{
-		return iterator(nullptr);
+		return iterator(NULL);
 	}
 
 	// find the node with the minimum key
@@ -513,25 +570,28 @@ int main() {
 	bst.insert(40);
 	bst.insert(87);
 	bst.insert(100);
+	bst.insert(3);
 	bst.prettyPrint();
 	bst.deleteNode(25);
 	bst.prettyPrint();
+
+	
 	
 	const_iterator it = bst.begin();
+
+	if (it == bst.end())
+	 {cout<<"Couldn" << endl;}
+
 	++it;
 
-	cout << *it << " ";
-
+	cout<<*it << endl;
+	
 	++it;
 
-	cout << *it << " ";
+	cout<<*it << endl;
+	++it;
 
-	// while (it != bst.end())
-    // {
-    //     cout << *it << " ";
-    //     ++it;
-    // }
-     cout << endl;
+	cout<<*it << endl;
 
 	return 0;
 }
