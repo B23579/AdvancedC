@@ -21,7 +21,7 @@ template< class T, typename CMP>
 // class RBTree implements the operations in Red Black Tree
 class RBTree {
 private:
-	Node* root;
+	NodePtr root;
 	NodePtr TNULL;
 
 	// initializes the nodes with appropirate values
@@ -34,8 +34,6 @@ private:
 		node->color = 0;
 	}
 
-
-
 	// fix the rb tree modified by the delete operation
 	void fixDelete(NodePtr x) {
 		NodePtr s;
@@ -43,7 +41,6 @@ private:
 			if (x == x->parent->_left) {
 				s = x->parent->_right;
 				if (s->color == 1) {
-					// case 3.1
 					s->color = 0;
 					x->parent->color = 1;
 					leftRotate(x->parent);
@@ -51,19 +48,16 @@ private:
 				}
 
 				if (s->_left->color == 0 && s->_right->color == 0) {
-					// case 3.2
 					s->color = 1;
 					x = x->parent;
 				} else {
 					if (s->_right->color == 0) {
-						// case 3.3
 						s->_left->color = 0;
 						s->color = 1;
 						rightRotate(s);
 						s = x->parent->_right;
 					} 
 
-					// case 3.4
 					s->color = x->parent->color;
 					x->parent->color = 0;
 					s->_right->color = 0;
@@ -73,7 +67,6 @@ private:
 			} else {
 				s = x->parent->_left;
 				if (s->color == 1) {
-					// case 3.1
 					s->color = 0;
 					x->parent->color = 1;
 					rightRotate(x->parent);
@@ -81,19 +74,16 @@ private:
 				}
 
 				if (s->_right->color == 0 && s->_right->color == 0) {
-					// case 3.2
 					s->color = 1;
 					x = x->parent;
 				} else {
 					if (s->_left->color == 0) {
-						// case 3.3
 						s->_right->color = 0;
 						s->color = 1;
 						leftRotate(s);
 						s = x->parent->_left;
 					} 
 
-					// case 3.4
 					s->color = x->parent->color;
 					x->parent->color = 0;
 					s->_left->color = 0;
@@ -176,18 +166,18 @@ private:
 			if (k->parent == k->parent->parent->_right) {
 				u = k->parent->parent->_left; // uncle
 				if (u->color == 1) {
-					// case 3.1
+				
 					u->color = 0;
 					k->parent->color = 0;
 					k->parent->parent->color = 1;
 					k = k->parent->parent;
 				} else {
 					if (k == k->parent->_left) {
-						// case 3.2.2
+						
 						k = k->parent;
 						rightRotate(k);
 					}
-					// case 3.2.1
+				
 					k->parent->color = 0;
 					k->parent->parent->color = 1;
 					leftRotate(k->parent->parent);
@@ -196,18 +186,18 @@ private:
 				u = k->parent->parent->_right; // uncle
 
 				if (u->color == 1) {
-					// mirror case 3.1
+					
 					u->color = 0;
 					k->parent->color = 0;
 					k->parent->parent->color = 1;
 					k = k->parent->parent;	
 				} else {
 					if (k == k->parent->_right) {
-						// mirror case 3.2.2
+				
 						k = k->parent;
 						leftRotate(k);
 					}
-					// mirror case 3.2.1
+					
 					k->parent->color = 0;
 					k->parent->parent->color = 1;
 					rightRotate(k->parent->parent);
@@ -251,19 +241,16 @@ public:
 	
 class const_iterator {
 	private:
-	Node* _pNode;
-	Node* TNULL;
+	NodePtr _pNode;
+	NodePtr TNULL;
 	// RBTree<T,CMP> _t;
 
 public:
 	typedef const_iterator Self; //Type of forward iterator
 	const_iterator(NodePtr n=nullptr) 
 		:_pNode(n)// Constructors // we construct an iterator through the pointer of a node
-	{
-	}
-	//Self& begin() const {return _pNode;}
+	{}
 	
-
 	// When the iterator dereferences, we return a reference to the node data
 	const T& operator*() const {
 		return this->_pNode->data;
@@ -274,12 +261,12 @@ public:
 	}
 
 	Self& operator++() {
-		incrimen();
+		 Increment();
 		return *this;
 	}
 
 	Self& operator++(int) {
-		incrimen();
+		 Increment();
 		Self tmp = this->_pNode;
 		return tmp;
 	}
@@ -297,97 +284,50 @@ public:
     //begin returns the iterator of the first node in the middle order, which is the left most node
     //end returns the iterator at the next position of the last node in the middle order. Here, use a null pointer.
 
-private:
-	void incrimen(){
-		Node* p;
-  Node* temp = _pNode;
-  if (this->_pNode == nullptr)
-    {
-      // ++ from end(). get the root of the tree
-      Node* temp = _pNode->parent;
-      
-      // error! ++ requested for an empty tree
-      if (temp == nullptr)
-      
-      // move to the smallest value in the tree,
-      // which is the first node inorder
-    	while (temp->_left != nullptr) {
-        temp = temp->_left;
-      }
-	  this->_pNode = temp; //++Then it becomes the node
-    }
-  else
-    if (temp->_right != nullptr)
-      {
-        // successor is the farthest left node of
-        // right subtree
-        temp = temp->_right;
-        
-        while (temp->_left != nullptr) {
-          temp = temp->_left;
-        }
-		//this->_pNode = temp; //++Then it becomes the node
-      }
-    else
-      {
-        // have already processed the left subtree, and
+private: 
+	void Increment() {
+
+		if (this->_pNode->_right != nullptr and this->_pNode->parent == nullptr) {
+			// The next access is the first node in the middle order in the right tree
+			NodePtr temp = _pNode->_right;
+
+			while (temp->_left) {
+				temp = temp->_left;
+			}
+				this->_pNode = temp; //++Then it becomes the node
+
+		}
+		else  //The right subtree is empty
+		{// have already processed the left subtree, and
         // there is no right subtree. move up the tree,
         // looking for a parent for which nodePtr is a left child,
         // stopping if the parent becomes NULL. a non-NULL parent
         // is the successor. if parent is NULL, the original node
         // was the last node inorder, and its successor
         // is the end of the list
-        p = temp->parent;
-        if (p != nullptr && temp == p->_right)
-          {
-            temp = p;
-            p = p->parent;
-          }
-        
-        // if we were previously at the right-most node in
-        // the tree, nodePtr = nullptr, and the iterator specifies
-        // the end of the list
-        this->_pNode= p;
-      }
-	}
-
-	void Increment() {
-		if (this->_pNode->_right) {
-			// The next access is the first node in the middle order in the right tree
-			Node* temp = _pNode->_right;
-
-			while (temp->_left) {
-				temp = temp->_left;
-			}
-			this->_pNode = temp; //++Then it becomes the node
-
-		}
-		else  //The right subtree is empty
-		{
 			//Find an ancestor whose child is not on the father's right
-			Node* tmp = _pNode->parent;
+			NodePtr tmp = _pNode->parent;
 
-			if (tmp->_right==_pNode) {
-				while (_pNode==tmp->_right and _pNode->parent!=TNULL)
+			if (tmp->_right!=_pNode) {
+				while (_pNode==tmp->_right and tmp->_right!= TNULL)
 				{
 					_pNode = tmp;
 					tmp = tmp->parent; //++Then it becomes the node
 				}
+				// if we were previously at the right-most node in
+        // the tree, nodePtr = nullptr, and the iterator specifies
+        // the end of the list
 			}
 			if (_pNode->_right != tmp)
 				_pNode = tmp;
 		}
 	}
-	
-
 };
 
-	 
-	
 	const_iterator begin() const
 	{
 		NodePtr left = this->root;
-		if (left && left->_left)
+		while (left && left->_left!= TNULL)
 		{
 			left = left->_left;
 		}
@@ -571,27 +511,43 @@ int main() {
 	bst.insert(87);
 	bst.insert(100);
 	bst.insert(3);
+
+	cout<< "Red-black-tree before node deletion"<<endl;
 	bst.PrintRBT();
 
 	bst.deleteNode(25);
+	cout<< "Red-black-tree after node deletion"<<endl;
 	bst.PrintRBT();
 
 	RBTree<int,std::less<int>>::const_iterator it = bst.begin();
 
-	++it;
+	cout<<endl;
 
-	cout<<*it << endl;
+	cout<<*it << " key return by bst.begin()"<<endl; 
 	
-	++it;
+	bool l{false};
 
-	cout<<*it << endl;
-	it++;
+	if( it==it) {
+		l=true;
+		cout<< "== condition is ok"<< endl;
+	}
+	l=0;
+	if( it!=bst.end()) {
+		l=true;
+		cout<< "!= condition is ok"<< endl;
+	}
 
-	cout<<*it << endl;
+	cout<<endl;
+	cout<< "test the iterators"<<endl;
+	cout <<endl;
 
-	// for (RBTree<int,std::less<int>>::const_iterator it = bst.begin(); it != bst.end();){
-    //     std::cout << *it << std::endl;}
-	// 	it++;
+	for (RBTree<int,std::less<int>>::const_iterator it = bst.begin(); it != bst.end();){
+
+        std::cout << *it << std::endl;
+		++it;
+		}
+
+	cout<<endl;
 
 	return 0;
 }
