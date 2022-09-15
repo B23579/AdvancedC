@@ -22,7 +22,6 @@ template< class T, typename CMP>
 class RBTree {
 private:
 	NodePtr root;
-	NodePtr TNULL;
 
 	// initializes the nodes with appropirate values
 	// all the pointers are set to point to the null pointer
@@ -109,9 +108,9 @@ private:
 
 	void deleteNodeHelper(NodePtr node, int key) {
 		// find the node containing key
-		NodePtr z = TNULL;
+		NodePtr z = nullptr;
 		NodePtr x, y;
-		while (node != TNULL){
+		while (node != nullptr){
 			if (node->data == key) {
 				z = node;
 			}
@@ -123,17 +122,17 @@ private:
 			}
 		}
 
-		if (z == TNULL) {
+		if (z == nullptr) {
 			cout<<"Couldn't find key in the tree"<<endl;
 			return;
 		} 
 
 		y = z;
 		int y_original_color = y->color;
-		if (z->_left == TNULL) {
+		if (z->_left == nullptr) {
 			x = z->_right;
 			rbTransplant(z, z->_right);
-		} else if (z->_right == TNULL) {
+		} else if (z->_right == nullptr) {
 			x = z->_left;
 			rbTransplant(z, z->_left);
 		} else {
@@ -163,7 +162,7 @@ private:
 	void fixInsert(NodePtr k){
 		NodePtr u;
 		while (k->parent->color == 1) {
-			if (k->parent == k->parent->parent->_right) {
+			if (k->parent == k->parent->parent->_right && k->parent->parent->_left != nullptr) {
 				u = k->parent->parent->_left; // uncle
 				if (u->color == 1) {
 				
@@ -185,7 +184,7 @@ private:
 			} else {
 				u = k->parent->parent->_right; // uncle
 
-				if (u->color == 1) {
+				if (k->parent->parent->_right != nullptr && u->color == 1) {
 					
 					u->color = 0;
 					k->parent->color = 0;
@@ -212,7 +211,7 @@ private:
 
 	void printRBtree(NodePtr root, string indent, bool last) {
 		// print the tree structure on the screen
-	   	if (root != TNULL) {
+	   	if (root != nullptr) {
 		   cout<<indent;
 		   if (last) {
 		      cout<<"R----";
@@ -234,17 +233,12 @@ private:
 
 public:
 	RBTree<T,CMP>() {
-		TNULL = new Node;
-		TNULL->color = 0;
-		TNULL->_left = nullptr;
-		TNULL->_right = nullptr;
-		root = TNULL;
+		root = nullptr;
 	}
 	
 class const_iterator {
 	private:
 	NodePtr _pNode;
-	NodePtr TNULL;
 	// RBTree<T,CMP> _t;
 
 public:
@@ -289,63 +283,55 @@ public:
 private: 
 	void Increment() {
 
-		if (this->_pNode->_right != nullptr and this->_pNode->parent == nullptr) {
-			// The next access is the first node in the middle order in the right tree
-			NodePtr temp = _pNode->_right;
+		//cout << _pNode->data << endl;
 
+		if (this->_pNode->_right != nullptr) {
+				NodePtr temp = this->_pNode->_right;
 			while (temp->_left) { //find the most left node of the node
 				temp = temp->_left;
 			}
-			
 			this->_pNode = temp; //++Then it becomes the node
-
 		}
-		else  //The right subtree is empty
-		{// have already processed the left subtree, and
-        // there is no right subtree. move up the tree,
-        // looking for a parent for which nodePtr is a left child,
-        // stopping if the parent becomes NULL. a non-NULL parent
-        // is the successor. if parent is NULL, the original node
-        // was the last node inorder, and its successor
-        // is the end of the list
-			//Find an ancestor whose child is not on the father's right
-			NodePtr tmp = _pNode->parent;
-
-			if (tmp->_right!=_pNode) {
-				while (_pNode==tmp->_right and tmp->_right!= TNULL)
-				{
-					_pNode = tmp;
-					tmp = tmp->parent; //++Then it becomes the node
+		else
+		{
+			if(_pNode->parent != nullptr){
+				if(this->_pNode == this->_pNode->parent->_left) {
+					this->_pNode = this->_pNode->parent;
+					} 
+				else{
+					if(this->_pNode->parent->parent != nullptr){
+						if(this->_pNode->parent == this->_pNode->parent->parent->_left)
+							_pNode = this->_pNode->parent->parent;
+						else
+							_pNode = nullptr;
+					}else
+						_pNode	 = nullptr;
 				}
-				// if we were previously at the right-most node in
-        // the tree, nodePtr = nullptr, and the iterator specifies
-        // the end of the list
 			}
-			if (_pNode->_right != tmp)
-				_pNode = tmp;
 		}
 	}
 };
 
+
 	const_iterator begin() const
 	{
-		NodePtr left = this->root;
-		while (left && left->_left!= TNULL)
+		NodePtr temp = this->root;
+		while (temp->_left != nullptr)
 		{
-			left = left->_left;
+			temp = temp->_left;
 		}
 
-		return const_iterator(left);
+		return const_iterator(temp);
 	}
 
 	const_iterator end() const
 	{
-		return const_iterator(TNULL);
+		return const_iterator(nullptr);
 	}
 
 	// find the node with the minimum key
 	NodePtr minimum(NodePtr node) {
-		while (node->_left != TNULL) {
+		while (node->_left != nullptr) {
 			node = node->_left;
 		}
 		return node;
@@ -353,7 +339,7 @@ private:
 
 	// find the node with the maximum key
 	NodePtr maximum(NodePtr node) {
-		while (node->_right != TNULL) {
+		while (node->_right != nullptr) {
 			node = node->_right;
 		}
 		return node;
@@ -364,14 +350,14 @@ private:
 		// if the right subtree is not null,
 		// the successor is the leftmost node in the
 		// right subtree
-		if (x->_right != TNULL) {
+		if (x->_right != nullptr) {
 			return minimum(x->_right);
 		}
 
 		// else it is the lowest ancestor of x whose
 		// left child is also an ancestor of x.
 		NodePtr y = x->parent;
-		while (y != TNULL && x == y->_right) {
+		while (y != nullptr && x == y->_right) {
 			x = y;
 			y = y->parent;
 		}
@@ -383,12 +369,12 @@ private:
 		// if the left subtree is not null,
 		// the predecessor is the right most node in the 
 		// left subtree
-		if (x->_left != TNULL) {
+		if (x->_left != nullptr) {
 			return maximum(x->_left);
 		}
 
 		NodePtr y = x->parent;
-		while (y != TNULL && x == y->_left) {
+		while (y != nullptr && x == y->_left) {
 			x = y;
 			y = y->parent;
 		}
@@ -400,7 +386,7 @@ private:
 	void leftRotate(NodePtr x) {
 		NodePtr y = x->_right;
 		x->_right = y->_left;
-		if (y->_left != TNULL) {
+		if (y->_left != nullptr) {
 			y->_left->parent = x;
 		}
 		y->parent = x->parent;
@@ -419,7 +405,7 @@ private:
 	void rightRotate(NodePtr x) {
 		NodePtr y = x->_left;
 		x->_left = y->_right;
-		if (y->_right != TNULL) {
+		if (y->_right != nullptr) {
 			y->_right->parent = x;
 		}
 		y->parent = x->parent;
@@ -441,14 +427,14 @@ private:
 		NodePtr node = new Node;
 		node->parent = nullptr;
 		node->data = key;
-		node->_left = TNULL;
-		node->_right = TNULL;
+		node->_left = nullptr;
+		node->_right = nullptr;
 		node->color = 1; // new node must be red
 
 		NodePtr y = nullptr;
 		NodePtr x = this->root;
 
-		while (x != TNULL) {
+		while (x != nullptr) {
 			y = x;
 			if (node->data < x->data) {
 				x = x->_left;
@@ -501,24 +487,22 @@ private:
 int main() {
 	RBTree<int,std::less<int>> bst;
 
-	bst.insert(4);
-	bst.insert(20);
-	bst.insert(18);
-	bst.insert(5);
-	bst.insert(15);
-	bst.insert(17);
-	bst.insert(25);
-	bst.insert(40);
-	bst.insert(87);
-	bst.insert(100);
+	bst.insert(7);
 	bst.insert(3);
+	bst.insert(2);
+	bst.insert(4);
+	bst.insert(8);
+	bst.insert(5);
+	bst.insert(6);
+	bst.insert(1);
+
 
 	cout<< "Red-black-tree before node deletion"<<endl;
 	
 
 	bst.PrintRBT();
 
-	bst.deleteNode(25);
+	bst.deleteNode(5);
 	cout<<endl;
 	cout<< "Red-black-tree after node deletion"<<endl;
 	bst.PrintRBT();
@@ -544,11 +528,13 @@ int main() {
 	cout<<endl;
 	cout<< "test the iterators"<<endl;
 	cout <<endl;
+	//RBTree<int,std::less<int>>::const_iterator itr = bst.begin();
 
-	for (RBTree<int,std::less<int>>::const_iterator it = bst.begin(); it != bst.end();){
-        std::cout << *it << std::endl;
-		++it;
-		}
+	for (RBTree<int,std::less<int>>::const_iterator its = bst.begin(); its != bst.end(); ++its){
+        	std::cout << *its << std::endl;
+	 	}
+	
+	
 
 	cout<<endl;
 
