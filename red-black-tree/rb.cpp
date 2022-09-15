@@ -34,7 +34,7 @@ private:
 		node->color = 0;
 	}
 
-	// fix the rb tree modified by the delete operation
+	// fix the red black tree modified by the delete operation
 	void fixDelete(NodePtr x) {
 		NodePtr s;
 		while (x != root && x->color == 0) {
@@ -210,7 +210,7 @@ private:
 		root->color = 0;
 	}
 
-	void printHelper(NodePtr root, string indent, bool last) {
+	void printRBtree(NodePtr root, string indent, bool last) {
 		// print the tree structure on the screen
 	   	if (root != TNULL) {
 		   cout<<indent;
@@ -224,8 +224,10 @@ private:
             
            string sColor = root->color?"RED":"BLACK";
 		   cout<<root->data<<"("<<sColor<<")"<<endl;
-		   printHelper(root->_left, indent, false);
-		   printHelper(root->_right, indent, true);
+		   printRBtree
+	(root->_left, indent, false);
+		   printRBtree
+	(root->_right, indent, true);
 		}
 		// cout<<root->left->data<<endl;
 	}
@@ -291,10 +293,11 @@ private:
 			// The next access is the first node in the middle order in the right tree
 			NodePtr temp = _pNode->_right;
 
-			while (temp->_left) {
+			while (temp->_left) { //find the most left node of the node
 				temp = temp->_left;
 			}
-				this->_pNode = temp; //++Then it becomes the node
+			
+			this->_pNode = temp; //++Then it becomes the node
 
 		}
 		else  //The right subtree is empty
@@ -378,7 +381,7 @@ private:
 	// find the predecessor of a given node
 	NodePtr predecessor(NodePtr x) {
 		// if the left subtree is not null,
-		// the predecessor is the rightmost node in the 
+		// the predecessor is the right most node in the 
 		// left subtree
 		if (x->_left != TNULL) {
 			return maximum(x->_left);
@@ -479,10 +482,6 @@ private:
 		fixInsert(node);
 	}
 
-	NodePtr getRoot(){
-		return this->root;
-	}
-
 	// delete the node from the tree
 	void deleteNode(int data) {
 		deleteNodeHelper(this->root, data);
@@ -491,7 +490,8 @@ private:
 	// print the tree structure on the screen
 	void PrintRBT() {
 	    if (root) {
-    		printHelper(this->root, "", true);
+    		printRBtree
+	(this->root, "", true);
 	    }
 	}
 
@@ -501,7 +501,8 @@ private:
 int main() {
 	RBTree<int,std::less<int>> bst;
 
-	bst.insert(8);
+	bst.insert(4);
+	bst.insert(20);
 	bst.insert(18);
 	bst.insert(5);
 	bst.insert(15);
@@ -513,9 +514,12 @@ int main() {
 	bst.insert(3);
 
 	cout<< "Red-black-tree before node deletion"<<endl;
+	
+
 	bst.PrintRBT();
 
 	bst.deleteNode(25);
+	cout<<endl;
 	cout<< "Red-black-tree after node deletion"<<endl;
 	bst.PrintRBT();
 
@@ -542,7 +546,6 @@ int main() {
 	cout <<endl;
 
 	for (RBTree<int,std::less<int>>::const_iterator it = bst.begin(); it != bst.end();){
-
         std::cout << *it << std::endl;
 		++it;
 		}
