@@ -106,7 +106,7 @@ private:
 		v->parent = u->parent;
 	}
 
-	void deleteNodeHelper(NodePtr node, int key) {
+	void deletethisNode(NodePtr node, int key) {
 		// find the node containing key
 		NodePtr z = nullptr;
 		NodePtr x, y;
@@ -262,9 +262,8 @@ public:
 	}
 
 	Self& operator++(int) {
-		 Increment();
-		Self tmp = this->_pNode;
-		return tmp;
+		Increment();
+		return *this;
 	}
 	// implement = = and != To determine whether the node is the same
 
@@ -470,7 +469,7 @@ private:
 
 	// delete the node from the tree
 	void deleteNode(int data) {
-		deleteNodeHelper(this->root, data);
+		deletethisNode(this->root, data);
 	}
 
 	// print the tree structure on the screen
@@ -530,7 +529,7 @@ int main() {
 	cout <<endl;
 	//RBTree<int,std::less<int>>::const_iterator itr = bst.begin();
 
-	for (RBTree<int,std::less<int>>::const_iterator its = bst.begin(); its != bst.end(); ++its){
+	for (RBTree<int,std::less<int>>::const_iterator its = bst.begin(); its != bst.end(); its++){
         	std::cout << *its << std::endl;
 	 	}
 	
