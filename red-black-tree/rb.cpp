@@ -1,9 +1,5 @@
 #include<iostream>
 using namespace std;
-#include <functional>
-
-// Template
-
 
 // data structure that represents a node in the tree
 struct Node {
@@ -22,16 +18,6 @@ template< class T, typename CMP>
 class RBTree {
 private:
 	NodePtr root;
-
-	// initializes the nodes with appropirate values
-	// all the pointers are set to point to the null pointer
-	void initializeNULLNode(NodePtr node, NodePtr parent) {
-		node->data = 0;
-		node->parent = parent;
-		node->_left = nullptr;
-		node->_right = nullptr;
-		node->color = 0;
-	}
 
 	// fix the red black tree modified by the delete operation
 	void fixDelete(NodePtr x) {
@@ -165,7 +151,6 @@ private:
 			if (k->parent == k->parent->parent->_right && k->parent->parent->_left != nullptr) {
 				u = k->parent->parent->_left; // uncle
 				if (u->color == 1) {
-				
 					u->color = 0;
 					k->parent->color = 0;
 					k->parent->parent->color = 1;
@@ -223,10 +208,8 @@ private:
             
            string sColor = root->color?"RED":"BLACK";
 		   cout<<root->data<<"("<<sColor<<")"<<endl;
-		   printRBtree
-	(root->_left, indent, false);
-		   printRBtree
-	(root->_right, indent, true);
+		   printRBtree(root->_left, indent, false);
+		   printRBtree(root->_right, indent, true);
 		}
 		// cout<<root->left->data<<endl;
 	}
@@ -274,11 +257,6 @@ public:
 		return this->_pNode != s._pNode;
 	}
 
-	// begin and end of iterators in red black tree:
-
-    //begin returns the iterator of the first node in the middle order, which is the left most node
-    //end returns the iterator at the next position of the last node in the middle order. Here, use a null pointer.
-
 private: 
 	void Increment() {
 
@@ -312,6 +290,11 @@ private:
 };
 
 
+	// begin and end of iterators in red black tree:
+
+    //begin returns the iterator of the left most node
+    //end returns the iterator at the next position of the last node in the middle order. Here, use a null pointer.
+
 	const_iterator begin() const
 	{
 		NodePtr temp = this->root;
@@ -342,43 +325,6 @@ private:
 			node = node->_right;
 		}
 		return node;
-	}
-
-	// find the successor of a given node
-	NodePtr successor(NodePtr x) {
-		// if the right subtree is not null,
-		// the successor is the leftmost node in the
-		// right subtree
-		if (x->_right != nullptr) {
-			return minimum(x->_right);
-		}
-
-		// else it is the lowest ancestor of x whose
-		// left child is also an ancestor of x.
-		NodePtr y = x->parent;
-		while (y != nullptr && x == y->_right) {
-			x = y;
-			y = y->parent;
-		}
-		return y;
-	}
-
-	// find the predecessor of a given node
-	NodePtr predecessor(NodePtr x) {
-		// if the left subtree is not null,
-		// the predecessor is the right most node in the 
-		// left subtree
-		if (x->_left != nullptr) {
-			return maximum(x->_left);
-		}
-
-		NodePtr y = x->parent;
-		while (y != nullptr && x == y->_left) {
-			x = y;
-			y = y->parent;
-		}
-
-		return y;
 	}
 
 	// rotate left at node x
@@ -475,8 +421,7 @@ private:
 	// print the tree structure on the screen
 	void PrintRBT() {
 	    if (root) {
-    		printRBtree
-	(this->root, "", true);
+    		printRBtree(this->root, "", true);
 	    }
 	}
 
@@ -532,8 +477,6 @@ int main() {
 	for (RBTree<int,std::less<int>>::const_iterator its = bst.begin(); its != bst.end(); its++){
         	std::cout << *its << std::endl;
 	 	}
-	
-	
 
 	cout<<endl;
 
